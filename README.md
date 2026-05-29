@@ -1,18 +1,18 @@
 # E-Commerce Backend — Documentation
 
-VitePress documentation site for the multi-tenant white-label e-commerce backend.
+VitePress documentation site for the multi-tenant white-label e-commerce backend!
 This is a standalone project, separated from the backend repository. The AI context
 docs (`docs/ai/`) intentionally remain in the backend repo.
 
 ## Audiences
 
-| Section       | Path           | Purpose                                              |
-| ------------- | -------------- | ---------------------------------------------------- |
-| User Guide    | `/guide/`      | How to use the platform as a customer                |
-| Admin Guide   | `/admin/`      | How to manage the platform                           |
-| Developer     | `/developer/`  | How to build and extend the platform                 |
-| Frontend      | `/frontend/`   | How to connect a frontend to the API                 |
-| Deployment    | `/deployment/` | Per-platform deploy guides                           |
+| Section     | Path           | Purpose                               |
+| ----------- | -------------- | ------------------------------------- |
+| User Guide  | `/guide/`      | How to use the platform as a customer |
+| Admin Guide | `/admin/`      | How to manage the platform            |
+| Developer   | `/developer/`  | How to build and extend the platform  |
+| Frontend    | `/frontend/`   | How to connect a frontend to the API  |
+| Deployment  | `/deployment/` | Per-platform deploy guides            |
 
 ## Develop
 
