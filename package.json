@@ -1,0 +1,15 @@
+{
+  "name": "e-commerce-backend-docs",
+  "version": "1.0.0",
+  "description": "Customer, Admin, Developer, and Frontend documentation for the multi-tenant e-commerce backend (VitePress).",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
