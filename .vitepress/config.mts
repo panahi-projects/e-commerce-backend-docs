@@ -227,5 +227,11 @@ export default defineConfig({
     search: { provider: "local" },
     socialLinks: [],
     outline: { level: [2, 3] },
+
+    footer: {
+      message:
+        'Written by <a href="http://panahi-projects.ir" target="_blank" rel="noopener">Saeed Panahi</a> &middot; <a href="mailto:panahi.projects@gmail.com">panahi.projects@gmail.com</a>',
+      copyright: "Copyright © 2026 Saeed Panahi",
+    },
   },
 });

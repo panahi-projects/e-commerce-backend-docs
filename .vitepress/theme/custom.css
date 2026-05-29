@@ -1,0 +1,12 @@
+/**
+ * Show the global themeConfig.footer on every page.
+ *
+ * By default VitePress hides the footer on pages that have a sidebar via a
+ * *scoped* style that compiles to `.VPFooter.has-sidebar[data-v-xxxxx]
+ * { display: none }`. The attribute selector gives it higher specificity than
+ * a plain `.VPFooter.has-sidebar`, so `!important` is required to override it
+ * and make the footer render on sidebar pages too.
+ */
+.VPFooter.has-sidebar {
+  display: block !important;
+}
