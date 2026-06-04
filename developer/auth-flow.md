@@ -2,6 +2,25 @@
 
 Dual-token JWT — short-lived access token + long-lived refresh token in an httpOnly cookie. Both secrets must be at least 32 chars (validated by Joi at boot).
 
+## Registration & login (OTP-first / passwordless)
+
+Registration takes a **single identifier** that is auto-detected as an email or an Iranian mobile number — no name, no password. The account is created passwordless and an OTP is sent over the matching channel; tokens are issued only after the OTP is verified.
+
+| Step | Endpoint | Body | Result |
+| ---- | -------- | ---- | ------ |
+| Register | `POST /auth/register` | `{ identifier }` | Creates the account, sends an OTP via email **or** SMS, returns `{ identifier, channel }` — no tokens. `409` if the identifier already exists. |
+| Login (request) | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Silent on unknown identifiers (no account enumeration). |
+| Verify | `POST /auth/verify-otp` | `{ identifier, code }` | Consumes the OTP, marks the email/phone verified, **issues tokens** (sets the refresh cookie). Completes both registration and login. |
+| Set password (opt-in) | `POST /auth/set-password` | `{ newPassword }` (authed) | Lets an OTP-first account enable classic password login. |
+
+Password login (`POST /auth/login`) still works for accounts that have a password (seeded admins, or users who called set-password). Passwordless accounts get `401` on password login until they set one.
+
+> [!TIP]
+> Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in Mailtrap, SMS in the sms.ir sandbox).
+
+> [!NOTE]
+> Profile details (first name, last name, address) are filled later via the profile endpoints. Checkout enforces them — see [Checkout identity gate](#identity-gate).
+
 ## Tokens
 
 | Token         | Lifetime | Storage                           | Purpose                                             |
@@ -58,6 +77,10 @@ The auth service generates 6-digit codes, stores them hashed with an attempt cou
 | SMS     | `POST /auth/otp/send-sms` | `POST /auth/otp/verify-sms` | `SmsService` → sms.ir `/send/verify` (see [SMS](./sms)) |
 
 The SMS endpoints take `{ phone, purpose }` / `{ phone, purpose, code }`. `purpose` is an `OtpPurpose` (`EMAIL_VERIFICATION`, `PHONE_VERIFICATION`, `PASSWORD_RESET`, `LOGIN_2FA`). Verifying a `PHONE_VERIFICATION` OTP sets `User.isPhoneVerified`. Send is silent for unknown phones/emails (never reveals whether an identifier is registered). The same hashed-OTP store and attempt/TTL rules back both channels.
+
+## Identity gate
+
+Because registration collects only an identifier, an account may have no name or address yet. `CheckoutService.initiate` blocks turning a cart into an order until the user has **firstName, lastName, and at least one address** — otherwise it throws `400 checkout.identity_incomplete`. Fill these via the profile endpoints before checkout.
 
 ## Roles & tenant binding
 

@@ -24,7 +24,7 @@ return { error: 'coupon.invalid' };
 
 ## i18n keys as messages
 
-By convention the `message` field on a thrown `HttpException` is an i18n key (`coupon.invalid`, `tenants.not_found`) that the client resolves. The filter does not translate today; it emits the raw key. This keeps server logic deterministic and pushes locale concerns to the client.
+By convention the `message` field on a thrown `HttpException` is an i18n key (`coupon.invalid`, `tenants.not_found`). The `HttpExceptionFilter` **resolves these to localized text server-side** via `I18nService` before responding — both the top-level `message` and each `errors[]` entry — using the request language (`?lang` / `x-lang` / `Accept-Language`, default `en`). Keys with no translation, and plain non-key strings (e.g. `Validation failed`), pass through unchanged. The same helper (`src/common/utils/i18n-message.ts`) backs the success-side `TransformInterceptor`, so success and error envelopes are localized consistently.
 
 ## Validation errors
 
