@@ -16,6 +16,7 @@
 | `newsletter`     | `true`  | Class-level gate on `NewsletterController` |
 | `popups`         | `false` | Reserved (no controller today)             |
 | `referralSystem` | `false` | Reserved (no controller today)             |
+| `smsBroadcast`   | `false` | Enables `POST /newsletter/sms-broadcast`   |
 
 ## Endpoints
 
@@ -27,9 +28,14 @@
 | `DELETE` | `/banners/:id`            | ADMIN       | `@FeatureFlag('marketing', 'banners')`    |
 | `POST`   | `/newsletter/subscribe`   | Public      | `@FeatureFlag('marketing', 'newsletter')` |
 | `POST`   | `/newsletter/unsubscribe` | Public      | `@FeatureFlag('marketing', 'newsletter')` |
-| `GET`    | `/newsletter/subscribers` | ADMIN/STAFF | `@FeatureFlag('marketing', 'newsletter')` |
+| `GET`    | `/newsletter/subscribers` | ADMIN/STAFF | `@FeatureFlag('marketing', 'newsletter')`    |
+| `POST`   | `/newsletter/sms-broadcast`| ADMIN      | `@FeatureFlag('marketing', 'smsBroadcast')`  |
 
-The flag is applied at the class level so every endpoint on each controller inherits it.
+The `newsletter` flag is applied at the class level so every newsletter endpoint inherits it. The `sms-broadcast` route declares its own `smsBroadcast` flag at the method level (method metadata wins over the class flag).
+
+## SMS broadcast
+
+`POST /newsletter/sms-broadcast` (body `{ text }`) sends to every `subscribed` member who provided a `phone`. Subscribers opt in via `POST /newsletter/subscribe` with an optional `phone` field (Iranian mobile format). The broadcast is self-contained to the marketing plugin's own data — it does **not** import the notifications plugin (zero plugin-to-plugin coupling); it calls the core `SmsService` directly. Returns `{ recipients }`.
 
 ## Banner schema essentials
 

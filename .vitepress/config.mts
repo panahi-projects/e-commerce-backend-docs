@@ -108,6 +108,7 @@ export default defineConfig({
             { text: "Error Handling", link: "/developer/error-handling" },
             { text: "Security", link: "/developer/security" },
             { text: "Payments", link: "/developer/payments" },
+            { text: "SMS", link: "/developer/sms" },
             { text: "Events", link: "/developer/events" },
           ],
         },

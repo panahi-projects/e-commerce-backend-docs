@@ -50,7 +50,14 @@ Revokes every refresh token for the user — they need to log in again everywher
 
 ## OTP
 
-`OtpService` in `src/modules/auth/` generates 6-digit codes, stores them with an attempt counter and TTL (`OTP_TTL_MINUTES`, default 10), and triggers email via `MailService`.
+The auth service generates 6-digit codes, stores them hashed with an attempt counter and TTL (`OTP_TTL_MINUTES`, default 10), and delivers them over one of two channels:
+
+| Channel | Send | Verify | Delivery |
+| ------- | ---- | ------ | -------- |
+| Email   | `POST /auth/otp/send`     | `POST /auth/otp/verify`     | `MailService` |
+| SMS     | `POST /auth/otp/send-sms` | `POST /auth/otp/verify-sms` | `SmsService` → sms.ir `/send/verify` (see [SMS](./sms)) |
+
+The SMS endpoints take `{ phone, purpose }` / `{ phone, purpose, code }`. `purpose` is an `OtpPurpose` (`EMAIL_VERIFICATION`, `PHONE_VERIFICATION`, `PASSWORD_RESET`, `LOGIN_2FA`). Verifying a `PHONE_VERIFICATION` OTP sets `User.isPhoneVerified`. Send is silent for unknown phones/emails (never reveals whether an identifier is registered). The same hashed-OTP store and attempt/TTL rules back both channels.
 
 ## Roles & tenant binding
 

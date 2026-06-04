@@ -6,7 +6,7 @@ In-process pub/sub via `@nestjs/event-emitter` (`EventEmitter2`). Used to decoup
 
 | Event                   | Emitted by                                 | Payload                                     | Consumed by                                                       |
 | ----------------------- | ------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------- |
-| `order.status-changed`  | `OrdersService.updateStatus`               | `{ orderId, fromStatus, toStatus, actor? }` | (currently no listeners — observable hook)                        |
+| `order.status-changed`  | `OrdersService.updateStatus`               | `{ orderId, orderNumber?, userId?, fromStatus, toStatus, actor?, tenantId }` | `NotificationsListener` — transactional SMS when `notifications.smsNotifications` is on |
 | `order.cancelled`       | `OrdersService.cancelByCustomer`           | `{ orderId }`                               | (none yet)                                                        |
 | `order.completed`       | `OrdersService.updateStatus` (→ COMPLETED) | `{ orderId, userId, total, tenantId }`      | `LoyaltyPointsService.handleOrderCompleted`                       |
 | `review.approved`       | `ReviewsService.moderate` (→ APPROVED)     | `{ reviewId, userId, productId, tenantId }` | `LoyaltyPointsService.handleReviewApproved`                       |
