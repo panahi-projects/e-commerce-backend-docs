@@ -9,11 +9,21 @@ Registration takes a **single identifier** that is auto-detected as an email or 
 | Step | Endpoint | Body | Result |
 | ---- | -------- | ---- | ------ |
 | Register | `POST /auth/register` | `{ identifier }` | Creates the account, sends an OTP via email **or** SMS, returns `{ identifier, channel }` — no tokens. `409` if the identifier already exists. |
-| Login (request) | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Silent on unknown identifiers (no account enumeration). |
-| Verify | `POST /auth/verify-otp` | `{ identifier, code }` | Consumes the OTP, marks the email/phone verified, **issues tokens** (sets the refresh cookie). Completes both registration and login. |
-| Set password (opt-in) | `POST /auth/set-password` | `{ newPassword }` (authed) | Lets an OTP-first account enable classic password login. |
+| Request OTP | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Silent on unknown identifiers (no account enumeration). |
+| Verify (register) | `POST /auth/verify-otp` | `{ identifier, code }` | Consumes the OTP, marks the email/phone verified, **issues tokens**. Completes registration; equivalent to OTP-only login. |
+| Set password (opt-in) | `POST /auth/set-password` | `{ newPassword }` (authed) | Lets an OTP-first account enable password login. |
 
-Password login (`POST /auth/login`) still works for accounts that have a password (seeded admins, or users who called set-password). Passwordless accounts get `401` on password login until they set one.
+### Login methods
+
+`POST /auth/login` is unified — supply an `identifier` (email or mobile, auto-detected) plus **at least one** credential. Which method runs is decided by what you send:
+
+| Method | Body | Notes |
+| ------ | ---- | ----- |
+| 1 — OTP only | `{ identifier, code }` | Passwordless. Call `request-otp` first. Works for any account. |
+| 2 — Password only | `{ identifier, password }` | Classic. Only accounts that set a password; others get `401`. |
+| 3 — Password + OTP (2FA) | `{ identifier, password, code }` | Both must pass. |
+
+Sending neither `password` nor `code` returns `400 auth.credentials_required`. A successful login (any method) issues tokens and sets the refresh cookie; an OTP method also marks the channel verified.
 
 > [!TIP]
 > Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in Mailtrap, SMS in the sms.ir sandbox).
