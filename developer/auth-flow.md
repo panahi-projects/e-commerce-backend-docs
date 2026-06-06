@@ -8,10 +8,23 @@ Registration takes a **single identifier** that is auto-detected as an email or 
 
 | Step | Endpoint | Body | Result |
 | ---- | -------- | ---- | ------ |
-| Register | `POST /auth/register` | `{ identifier }` | Creates the account, sends an OTP via email **or** SMS, returns `{ identifier, channel }` — no tokens. `409` if the identifier already exists. |
+| Register | `POST /auth/register` | `{ identifier }` | Creates the account, **stores** an OTP, and attempts to send it via email/SMS. Returns `{ identifier, channel, delivery }` — no tokens. `409` if the identifier already exists. |
 | Request OTP | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Silent on unknown identifiers (no account enumeration). |
 | Verify (register) | `POST /auth/verify-otp` | `{ identifier, code }` | Consumes the OTP, marks the email/phone verified, **issues tokens**. Completes registration; equivalent to OTP-only login. |
-| Set password (opt-in) | `POST /auth/set-password` | `{ newPassword }` (authed) | Lets an OTP-first account enable password login. |
+| Set password (first-time) | `POST /auth/set-password` | `{ newPassword }` (authed) | Sets an initial password for an OTP-first account. **First time only** — `409` if a password already exists. |
+| Change password | `POST /auth/change-password` | `{ currentPassword, newPassword }` (authed) | Change an existing password (must know the current one). |
+| Forgot password | `POST /auth/forgot-password` | `{ identifier }` | Sends a reset OTP to the identifier (email/mobile). Silent if unknown. |
+| Reset password | `POST /auth/reset-password` | `{ identifier, code, newPassword }` | Recovery when the current password is forgotten — proves ownership via OTP, sets a new password, revokes sessions. |
+
+### Password lifecycle
+
+Accounts start **passwordless** (OTP-only). The password is optional and follows a strict lifecycle:
+
+1. **set-password** — sets the *first* password (authenticated). Rejected with `409` once a password exists.
+2. **change-password** — changes an existing password; must supply the current one.
+3. **forgot-password → reset-password** — recovery when the current password is forgotten (identifier + OTP).
+
+`GET /auth/me` returns **`hasPassword: boolean`** so the UI knows whether to offer *set-password* (false → OTP-only) or *change-password* (true). OTP login works regardless of whether a password is set.
 
 ### Login methods
 
@@ -25,8 +38,11 @@ Registration takes a **single identifier** that is auto-detected as an email or 
 
 Sending neither `password` nor `code` returns `400 auth.credentials_required`. A successful login (any method) issues tokens and sets the refresh cookie; an OTP method also marks the channel verified.
 
+> [!IMPORTANT]
+> **OTP generation, storage, and delivery are decoupled.** The OTP is generated and stored first; sending it is best-effort. If the SMS/email can't be delivered, registration (and `request-otp`) **still succeed** — the response stays `200` and reports `delivery: { channel, sent: false, detail }`. The stored code is fully usable: read it from the `otps` collection (each row carries the `identifier` it was generated for; set `OTP_HASHED=false` to store the raw code) and complete `verify-otp` manually. Delivery failures no longer return `502` from the auth endpoints.
+
 > [!TIP]
-> Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in Mailtrap, SMS in the sms.ir sandbox).
+> Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in Mailtrap, SMS in the sms.ir sandbox). You can also set `OTP_HASHED=false` to store the **raw** code in the `otps` collection (instead of the default SHA-256 hash) and read it straight from the DB — OTPs are short-lived and TTL-expired, so this is testing-only; keep `OTP_HASHED=true` in production.
 
 > [!NOTE]
 > Profile details (first name, last name, address) are filled later via the profile endpoints. Checkout enforces them — see [Checkout identity gate](#identity-gate).
@@ -55,6 +71,18 @@ client                       /auth/login                MongoDB
 ```
 
 The refresh token is stored hashed in `RefreshToken` collection so we can revoke it server-side.
+
+## Logout & access-token revocation
+
+Access tokens are stateless, so logout doesn't just rely on expiry — it actively revokes them via a **Redis denylist** (`TokenRevocationService`):
+
+- Every access token is signed with a unique `jti`.
+- `POST /auth/logout` revokes the refresh token **and** denylists the current access token's `jti` (TTL = its remaining lifetime). The very next request with that token gets `401 auth.token_revoked`.
+- `POST /auth/logout-all` revokes all refresh tokens **and** sets a per-user cutoff; any access token issued before it is rejected.
+- `JwtStrategy` checks the denylist on every authenticated request.
+
+> [!NOTE]
+> The revocation check **fails open** if Redis is down (the request is allowed, logged at warn) — consistent with the platform's "never fail a request because the cache is down" rule, and the exposure window is bounded by the short access-token TTL (15 min).
 
 ## Refresh sequence
 

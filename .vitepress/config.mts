@@ -18,12 +18,12 @@ export default defineConfig({
       { text: "Cheatsheet", link: "/cheatsheet" },
       {
         text: "API (Swagger)",
-        link: "https://ecommerce-shayegan-design.panahi-projects.ir/api/v1/docs",
+        link: "https://ecommerce.panahi-projects.ir/api/v1/docs",
         target: "_blank",
       },
       {
         text: "API (Labs)",
-        link: "https://ecommerce-shayegan-design.panahi-projects.ir/api/v1/reference",
+        link: "https://ecommerce.panahi-projects.ir/api/v1/reference",
         target: "_blank",
       },
     ],
