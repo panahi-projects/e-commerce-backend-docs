@@ -21,6 +21,8 @@ All under `/api/v1/admin/tenants`, all require `ADMIN`.
 
 ## Creating a tenant
 
+> `tenantId` is **unique** (case-insensitive — stored lowercased). Creating one that already exists returns `409 tenants.already_exists`. On existing deployments the DB unique index may be missing (production runs with `autoIndex` off); build it with `npm run migrate:tenant-indexes` after removing any duplicates.
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/admin/tenants \
   -H 'Authorization: Bearer <admin-token>' \
@@ -76,5 +78,6 @@ Sets `isActive: false`. The `FeatureFlagService` returns "inactive" for an inact
 
 1. `POST /admin/tenants` with the right plan and the agreed plugin list.
 2. (Optional) `PATCH /admin/tenants/:id/flags/<pluginKey>` to tweak any flag beyond the defaults.
-3. Hand over the admin login (or invite a tenant admin user).
-4. Done — no redeploy required, the tenant's API is live.
+3. Invite the first tenant admin: `POST /admin/tenants/:tenantId/provision-admin` with `{ "identifier": "owner@acme.com" }` **or** a mobile `{ "identifier": "0912…" }` — the invite/OTP is delivered over that channel (email template or SMS). The invitee sets a password via `POST /auth/reset-password` (identifier + code + newPassword) or just logs in by OTP (`request-otp` → `verify-otp`). In non-production the code is also printed to the server console as `[DEV OTP]`.
+4. The tenant admin then manages users in their tenant via `/users` (promote a registered user to staff/admin with `PATCH /users/:id { "role": "tenant_staff" }`).
+5. Done — no redeploy required, the tenant's API is live.

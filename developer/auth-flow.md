@@ -9,7 +9,7 @@ Registration takes a **single identifier** that is auto-detected as an email or 
 | Step | Endpoint | Body | Result |
 | ---- | -------- | ---- | ------ |
 | Register | `POST /auth/register` | `{ identifier }` | Creates the account, **stores** an OTP, and attempts to send it via email/SMS. Returns `{ identifier, channel, delivery }` — no tokens. `409` if the identifier already exists. |
-| Request OTP | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Silent on unknown identifiers (no account enumeration). |
+| Request OTP | `POST /auth/request-otp` | `{ identifier }` | Sends a fresh OTP to an existing account. Returns `data.codeSent: { email, mobile }` - which channel the code went out on (only the channel matching the identifier can be `true`; unknown identifier yields both `false`). |
 | Verify (register) | `POST /auth/verify-otp` | `{ identifier, code }` | Consumes the OTP, marks the email/phone verified, **issues tokens**. Completes registration; equivalent to OTP-only login. |
 | Set password (first-time) | `POST /auth/set-password` | `{ newPassword }` (authed) | Sets an initial password for an OTP-first account. **First time only** — `409` if a password already exists. |
 | Change password | `POST /auth/change-password` | `{ currentPassword, newPassword }` (authed) | Change an existing password (must know the current one). |

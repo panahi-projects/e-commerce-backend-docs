@@ -16,10 +16,12 @@ Returns your name, email, role, email-verification status, and saved addresses.
 curl -X PATCH http://localhost:3000/api/v1/profile \
   -H 'Authorization: Bearer <access-token>' \
   -H 'Content-Type: application/json' \
-  -d '{ "firstName": "Jane", "lastName": "Doe", "phone": "+1-555-0100" }'
+  -d '{ "firstName": "Jane" }'
 ```
 
-Email cannot be changed via this endpoint — an admin can do it for you.
+All fields are **optional** — send only the ones you want to change (e.g. just `firstName`).
+
+If your account registered with a **phone number**, that phone can't be changed here (it's your login identity) — attempting to change it returns `400`. Email likewise cannot be changed via this endpoint.
 
 ## Addresses
 

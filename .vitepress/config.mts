@@ -164,6 +164,10 @@ export default defineConfig({
                   text: "Notifications",
                   link: "/developer/plugins/existing-plugins/notifications",
                 },
+                {
+                  text: "Audit Logs",
+                  link: "/developer/plugins/existing-plugins/audit-logs",
+                },
               ],
             },
           ],

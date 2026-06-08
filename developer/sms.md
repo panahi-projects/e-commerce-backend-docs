@@ -109,6 +109,10 @@ Overrides apply to that single call only (a one-off provider instance is built v
 
 Sabanovin is the default provider (`SMS_DEFAULT_PROVIDER=sabanovin`). It has no template — OTPs are sent through the reserved `gateway=otp` with text composed from `SABANOVIN_OTP_TEXT` (`{code}` is substituted). **Every Sabanovin SMS (OTP and free-text) automatically gets the mandatory opt-out keyword appended** — `SABANOVIN_CANCEL_TEXT` (default `لغو11`) — required by Iranian SMS regulations. It's added once, at the end, unless already present. All auth OTP flows (register, login/request-otp, reset-password) go through this provider since they all call `SmsService`.
 
+## Debug logging
+
+Set **`SMS_DEBUG_LOG=true`** to have the active provider log every outgoing SMS (recipient + the exact composed text, including the Sabanovin `لغو11` suffix) to the console — useful for local testing without checking the provider panel. For template-based providers the final text lives on the vendor's side, so the log shows the template/pattern id + code instead (sms.ir `template=… code=…`, Melipayamak `bodyId=… code=…`). Off by default; **keep it off in production** (it would log codes).
+
 ## Resilience & troubleshooting
 
 - **A provider failure never crashes the app.** SMS sends are awaited, so a provider rejection becomes a clean `502` (`sms.send_failed` / `sms.auth_failed`) on that request; the rest of the API keeps serving. A process-level safety net in `main.ts` (`unhandledRejection` / `uncaughtException`) logs and keeps the process alive, and production runs with `restart: unless-stopped`.
