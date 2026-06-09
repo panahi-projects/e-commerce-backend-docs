@@ -4,7 +4,7 @@ This section is for **frontend developers** building apps (admin panel, storefro
 
 ## Before you start
 
-1. Get the **API base URL** from your backend team (e.g. `https://panahi-projects.liara.run/api/v1`)
+1. Get the **API base URL** from your backend team (e.g. `{base-url}/api/v1`)
 2. Ask them to add your dev/production origin to `CORS_ORIGINS` on the server
 3. Open the [Swagger UI]({base-url}/api/v1/docs) to explore all endpoints interactively
 

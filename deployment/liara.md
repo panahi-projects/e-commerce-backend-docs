@@ -241,7 +241,7 @@ The OpenAPI JSON spec is at `/api/v1/docs-json` — use it with code generators 
 In the Liara Console, go to **Settings > Environment Variables** and update:
 
 ```env
-CORS_ORIGINS=https://panahi-projects.liara.run,https://admin-panel.liara.run,https://shop.example.com
+CORS_ORIGINS={base-url},https://admin-panel.liara.run,https://shop.example.com
 ```
 
 Each origin is the **exact URL** the frontend is served from (scheme + host, no trailing slash, no path). Restart the app after changing.

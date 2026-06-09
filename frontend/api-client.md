@@ -13,7 +13,7 @@ https://<backend-domain>/api/v1/docs-json
 Download it:
 
 ```bash
-curl -o openapi.json https://panahi-projects.liara.run/api/v1/docs-json
+curl -o openapi.json {base-url}/api/v1/docs-json
 ```
 
 ## Option 1 — openapi-typescript (types only)
@@ -50,7 +50,7 @@ import createClient from 'openapi-fetch';
 import type { paths } from './api/schema';
 
 const api = createClient<paths>({
-  baseUrl: 'https://panahi-projects.liara.run',
+  baseUrl: '{base-url}',
   credentials: 'include',
   headers: { 'X-Tenant-ID': 'default' },
 });
@@ -81,7 +81,7 @@ Re-run the generator whenever the backend API changes. You can add a script to `
 ```json
 {
   "scripts": {
-    "api:types": "curl -o openapi.json https://panahi-projects.liara.run/api/v1/docs-json && npx openapi-typescript openapi.json -o src/api/schema.ts"
+    "api:types": "curl -o openapi.json {base-url}/api/v1/docs-json && npx openapi-typescript openapi.json -o src/api/schema.ts"
   }
 }
 ```
@@ -90,5 +90,5 @@ Re-run the generator whenever the backend API changes. You can add a script to `
 
 1. Open Postman
 2. Click **Import**
-3. Paste the URL: `https://panahi-projects.liara.run/api/v1/docs-json`
+3. Paste the URL: `{base-url}/api/v1/docs-json`
 4. Postman creates a collection with all endpoints, grouped by tag

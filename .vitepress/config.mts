@@ -1,5 +1,10 @@
 import { defineConfig } from "vitepress";
 
+// Single source of truth for the deployed backend/API base URL.
+// Change this ONE line when the domain changes; every nav link and every
+// docs page that uses the `{base-url}` placeholder updates automatically.
+const API_BASE_URL = "https://ecommerce.panahi-projects.ir";
+
 export default defineConfig({
   title: "E-Commerce Platform Docs",
   description:
@@ -7,6 +12,33 @@ export default defineConfig({
   base: "/e-commerce-backend-docs/",
   cleanUrls: true,
   ignoreDeadLinks: true,
+
+  // Replace the `{base-url}` placeholder with API_BASE_URL across all pages,
+  // including inside code fences and link hrefs. Runs in both dev and build.
+  markdown: {
+    config: (md) => {
+      const replace = (str: unknown) =>
+        typeof str === "string"
+          ? str
+              .split("{base-url}")
+              .join(API_BASE_URL)
+              // markdown-it percent-encodes `{`/`}` in link destinations
+              .split("%7Bbase-url%7D")
+              .join(API_BASE_URL)
+          : str;
+
+      md.core.ruler.push("replace_base_url", (state) => {
+        const walk = (token: any) => {
+          if (token.content) token.content = replace(token.content);
+          if (token.attrs) {
+            for (const attr of token.attrs) attr[1] = replace(attr[1]);
+          }
+          if (token.children) token.children.forEach(walk);
+        };
+        state.tokens.forEach(walk);
+      });
+    },
+  },
 
   themeConfig: {
     nav: [
@@ -18,12 +50,12 @@ export default defineConfig({
       { text: "Cheatsheet", link: "/cheatsheet" },
       {
         text: "API (Swagger)",
-        link: "https://ecommerce.panahi-projects.ir/api/v1/docs",
+        link: `${API_BASE_URL}/api/v1/docs`,
         target: "_blank",
       },
       {
         text: "API (Labs)",
-        link: "https://ecommerce.panahi-projects.ir/api/v1/reference",
+        link: `${API_BASE_URL}/api/v1/reference`,
         target: "_blank",
       },
     ],
