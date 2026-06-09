@@ -50,17 +50,15 @@ Every response follows the same envelope — **you never have to guess the shape
 {
   "success": true,
   "statusCode": 200,
-  "message": "Success",
+  "message": "OK",
   "data": { ... },
   "meta": {
+    "total": 42,
     "page": 1,
-    "limit": 10,
-    "totalDocs": 42,
-    "totalPages": 5,
-    "hasNextPage": true,
-    "hasPrevPage": false
+    "limit": 20,
+    "totalPages": 5
   },
-  "timestamp": "2026-05-27T12:00:00.000Z"
+  "timestamp": "2026-06-09T12:00:00.000Z"
 }
 ```
 
@@ -74,14 +72,14 @@ Every response follows the same envelope — **you never have to guess the shape
   "success": false,
   "statusCode": 400,
   "message": "Validation failed",
-  "errors": [{ "field": "email", "message": "email must be a valid email" }],
-  "timestamp": "2026-05-27T12:00:00.000Z",
+  "errors": [{ "field": "identifier", "message": "identifier should not be empty" }],
+  "timestamp": "2026-06-09T12:00:00.000Z",
   "path": "/api/v1/auth/register"
 }
 ```
 
-- `errors[]` — present on validation failures (400). Each entry has `field` and `message`.
-- `message` — a human-readable string (may be an i18n key like `auth.invalid_credentials`)
+- `errors[]` — present on validation failures (400). Each entry has a `message` and an optional `field`.
+- `message` — a human-readable, localized string (resolved from an i18n key like `auth.invalid_credentials`)
 
 ### TypeScript types
 
@@ -99,18 +97,16 @@ interface ApiError {
   success: false;
   statusCode: number;
   message: string;
-  errors?: { field: string; message: string }[];
+  errors?: { field?: string; message: string }[];
   timestamp: string;
-  path: string;
+  path?: string;
 }
 
 interface PaginationMeta {
+  total: number;
   page: number;
   limit: number;
-  totalDocs: number;
   totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
 }
 
 type ApiResponse<T> = ApiSuccess<T> | ApiError;
@@ -120,16 +116,17 @@ type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 List endpoints accept these query parameters:
 
-| Param   | Type   | Default      | Description                           |
-| ------- | ------ | ------------ | ------------------------------------- |
-| `page`  | number | `1`          | Page number (1-based)                 |
-| `limit` | number | `10`         | Items per page                        |
-| `sort`  | string | `-createdAt` | Sort field. Prefix `-` for descending |
+| Param       | Type   | Default | Description                          |
+| ----------- | ------ | ------- | ------------------------------------ |
+| `page`      | number | `1`     | Page number (1-based)                |
+| `limit`     | number | `20`    | Items per page (max `100`)           |
+| `sortBy`    | string | —       | Field to sort by (e.g. `price`)      |
+| `sortOrder` | string | `desc`  | `asc` or `desc`                      |
 
 Example:
 
 ```
-GET /api/v1/products?page=2&limit=20&sort=-price
+GET /api/v1/products?page=2&limit=20&sortBy=price&sortOrder=asc
 ```
 
 ## Error handling pattern

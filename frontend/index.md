@@ -20,12 +20,12 @@ This section is for **frontend developers** building apps (admin panel, storefro
 ## Quick start (30 seconds)
 
 ```typescript
-// 1. Login
+// 1. Login (identifier = email or mobile; seed admin has a password)
 const res = await fetch('https://YOUR-API/api/v1/auth/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include', // sends & receives cookies (refresh token)
-  body: JSON.stringify({ email: 'alice@admin.com', password: 'Test@1234' }),
+  body: JSON.stringify({ identifier: 'alice@admin.com', password: 'Test@1234' }),
 });
 const { data } = await res.json();
 const token = data.accessToken;

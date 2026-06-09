@@ -31,7 +31,7 @@ import type { paths } from './api/schema';
 
 type LoginBody = paths['/api/v1/auth/login']['post']['requestBody']['content']['application/json'];
 type LoginResponse =
-  paths['/api/v1/auth/login']['post']['responses']['201']['content']['application/json'];
+  paths['/api/v1/auth/login']['post']['responses']['200']['content']['application/json'];
 ```
 
 ## Option 2 — openapi-fetch (types + client)
