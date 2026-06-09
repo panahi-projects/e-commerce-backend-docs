@@ -129,7 +129,7 @@ NAS-specific gotchas:
 
 - **Mount the bind paths off the NAS share** if you want backups visible in the file manager. Replace the named volumes with a `device:` driver bind to your shared folder.
 - **NAS firmware updates may restart Docker**. The `restart: unless-stopped` policy handles that — your stack comes back up on its own.
-- **Build on a beefier machine**. NAS CPUs are often ARM or low-power Intel; `npm ci` on the build stage can take 15+ minutes. Either pre-build the image elsewhere and `docker save | docker load` it onto the NAS, or push to a registry and `image:` reference it from the compose file.
+- **Build on a beefier machine**. NAS CPUs are often ARM or low-power Intel; `npm install` on the build stage can take 15+ minutes. Either pre-build the image elsewhere and `docker save | docker load` it onto the NAS, or push to a registry and `image:` reference it from the compose file.
 
 ## Running on a home-lab / dev box
 

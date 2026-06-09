@@ -28,7 +28,7 @@ The project relies on indexes — `autoIndex: true` outside production, `false` 
 
 | Collection         | Index                                         |
 | ------------------ | --------------------------------------------- |
-| `users`            | `{ email: 1 }` unique                         |
+| `users`            | `{ email: 1 }` partial-unique (only when `email` is a string; phone-only accounts excluded). `{ phone: 1 }` partial (uniqueness enforced in app layer) |
 | `tenants`          | `{ tenantId: 1 }` unique                      |
 | `products`         | `{ slug: 1 }` unique, text index on name/desc |
 | `categories`       | `{ slug: 1 }` unique                          |

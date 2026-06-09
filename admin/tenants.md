@@ -4,7 +4,7 @@ A tenant is one customer of the white-label platform — one shop. The tenant do
 
 ## Endpoints
 
-All under `/api/v1/admin/tenants`, all require `ADMIN`.
+All under `/api/v1/admin/tenants`, all require `super_admin`.
 
 | Method   | Path                                    | Purpose                                      |
 | -------- | --------------------------------------- | -------------------------------------------- |
@@ -17,6 +17,7 @@ All under `/api/v1/admin/tenants`, all require `ADMIN`.
 | `PATCH`  | `/:tenantId/plugins/:pluginKey/enable`  | Enable a plugin                              |
 | `PATCH`  | `/:tenantId/plugins/:pluginKey/disable` | Disable a plugin                             |
 | `PATCH`  | `/:tenantId/flags/:pluginKey`           | Update flags for a plugin                    |
+| `POST`   | `/:tenantId/provision-admin`            | Provision the tenant's first admin           |
 | `DELETE` | `/:tenantId`                            | Soft-delete (set `isActive: false`)          |
 
 ## Creating a tenant

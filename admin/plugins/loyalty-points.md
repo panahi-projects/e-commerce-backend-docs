@@ -12,13 +12,13 @@ The plugin declares `dependsOn: ['reviews']` — enabling it for a tenant that d
 
 ## Endpoints
 
-| Method | Path                             | Role        | Purpose                          |
-| ------ | -------------------------------- | ----------- | -------------------------------- |
-| `GET`  | `/api/v1/loyalty/balance`        | Authed      | The caller's balance             |
-| `GET`  | `/api/v1/loyalty/transactions`   | Authed      | The caller's transaction history |
-| `POST` | `/api/v1/loyalty/redeem`         | Authed      | Spend points (gated by flag)     |
-| `GET`  | `/api/v1/loyalty/admin/accounts` | ADMIN/STAFF | All loyalty accounts for tenant  |
-| `POST` | `/api/v1/loyalty/admin/adjust`   | ADMIN/STAFF | Manually credit / debit          |
+| Method | Path                             | Role               | Purpose                          |
+| ------ | -------------------------------- | ------------------ | -------------------------------- |
+| `GET`  | `/api/v1/loyalty/balance`        | Authed             | The caller's balance             |
+| `GET`  | `/api/v1/loyalty/transactions`   | Authed             | The caller's transaction history |
+| `POST` | `/api/v1/loyalty/redeem`         | Authed             | Spend points (gated by flag)     |
+| `GET`  | `/api/v1/loyalty/admin/accounts` | tenant_admin/staff | All loyalty accounts for tenant  |
+| `POST` | `/api/v1/loyalty/admin/adjust`   | tenant_admin/staff | Manually credit / debit          |
 
 ## Manually adjusting a balance
 

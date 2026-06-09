@@ -4,7 +4,7 @@ Get the project running locally.
 
 ## Prerequisites
 
-- Node.js 20.x or later (matches the `@types/node` major).
+- Node.js 22.x (the Docker base image is `node:22-alpine`).
 - MongoDB 6.x running locally (or remote URI).
 - Redis 7.x running locally (used by feature-flag cache; mail queue is optional).
 - pnpm or npm — examples use npm.

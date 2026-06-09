@@ -4,12 +4,12 @@ The `marketing` plugin ships two controllers — banners and newsletter — each
 
 ## Banners
 
-| Method   | Path                  | Role        | Purpose                        |
-| -------- | --------------------- | ----------- | ------------------------------ |
-| `GET`    | `/api/v1/banners`     | Public      | Active banners (within window) |
-| `POST`   | `/api/v1/banners`     | ADMIN/STAFF | Create                         |
-| `PATCH`  | `/api/v1/banners/:id` | ADMIN/STAFF | Update                         |
-| `DELETE` | `/api/v1/banners/:id` | ADMIN       | Delete                         |
+| Method   | Path                  | Role               | Purpose                        |
+| -------- | --------------------- | ------------------ | ------------------------------ |
+| `GET`    | `/api/v1/banners`     | Public             | Active banners (within window) |
+| `POST`   | `/api/v1/banners`     | tenant_admin/staff | Create                         |
+| `PATCH`  | `/api/v1/banners/:id` | tenant_admin/staff | Update                         |
+| `DELETE` | `/api/v1/banners/:id` | tenant_admin       | Delete                         |
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/banners \
@@ -27,12 +27,12 @@ curl -X POST http://localhost:3000/api/v1/banners \
 
 ## Newsletter
 
-| Method | Path                             | Role        | Purpose                         |
-| ------ | -------------------------------- | ----------- | ------------------------------- |
-| `POST` | `/api/v1/newsletter/subscribe`   | Public      | Subscribe by email              |
-| `POST` | `/api/v1/newsletter/unsubscribe` | Public      | Unsubscribe by token from email |
-| `GET`  | `/api/v1/newsletter/subscribers` | ADMIN/STAFF | Audit list                      |
-| `POST` | `/api/v1/newsletter/sms-broadcast` | ADMIN     | SMS to subscribers with a phone (`smsBroadcast` flag) |
+| Method | Path                             | Role               | Purpose                         |
+| ------ | -------------------------------- | ------------------ | ------------------------------- |
+| `POST` | `/api/v1/newsletter/subscribe`   | Public             | Subscribe by email              |
+| `POST` | `/api/v1/newsletter/unsubscribe` | Public             | Unsubscribe by token from email |
+| `GET`  | `/api/v1/newsletter/subscribers` | tenant_admin/staff | Audit list                      |
+| `POST` | `/api/v1/newsletter/sms-broadcast` | tenant_admin     | SMS to subscribers with a phone (`smsBroadcast` flag) |
 
 Subscribers may optionally supply a `phone` at subscribe time. The `subscribed` subscribers who have a phone are the recipients of an SMS broadcast.
 

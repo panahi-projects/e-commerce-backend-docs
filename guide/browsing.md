@@ -27,21 +27,25 @@ Search is full-text over `name.en` and `description.en`.
 | `minPrice`      | Lower bound on the product's `basePrice`         |
 | `maxPrice`      | Upper bound                                      |
 | `isFeatured`    | `true` returns featured products only            |
-| `sort`          | e.g. `-createdAt`, `basePrice`, `-averageRating` |
+| `sortBy`        | Field to sort by, e.g. `createdAt`, `basePrice`, `averageRating` |
+| `sortOrder`     | `asc` or `desc` (default `desc`)                 |
 
 Example:
 
 ```bash
-curl 'http://localhost:3000/api/v1/products?categoryId=655e...&minPrice=20&maxPrice=80&sort=-averageRating'
+curl 'http://localhost:3000/api/v1/products?categoryId=655e...&minPrice=20&maxPrice=80&sortBy=averageRating&sortOrder=desc'
 ```
 
-## One product by slug or id
+## One product by slug
 
 ```bash
-curl http://localhost:3000/api/v1/products/655ec1...
+curl http://localhost:3000/api/v1/products/red-running-shoes
+```
 
-# or by slug
-curl http://localhost:3000/api/v1/products/slug/red-running-shoes
+## Featured products
+
+```bash
+curl http://localhost:3000/api/v1/products/featured
 ```
 
 ## Categories

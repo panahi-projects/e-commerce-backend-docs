@@ -4,14 +4,14 @@ The `coupons` plugin lets a tenant offer discount codes. Three flag-controlled t
 
 ## Endpoints
 
-| Method   | Path                            | Role        | Purpose                            |
-| -------- | ------------------------------- | ----------- | ---------------------------------- |
-| `POST`   | `/api/v1/coupons/validate`      | Public      | Validate a code against a subtotal |
-| `GET`    | `/api/v1/coupons/free-shipping` | Public      | List active free-shipping codes    |
-| `GET`    | `/api/v1/coupons`               | ADMIN/STAFF | List all coupons                   |
-| `POST`   | `/api/v1/coupons`               | ADMIN       | Create                             |
-| `PATCH`  | `/api/v1/coupons/:id`           | ADMIN       | Update                             |
-| `DELETE` | `/api/v1/coupons/:id`           | ADMIN       | Deactivate (soft-disable)          |
+| Method   | Path                            | Role               | Purpose                            |
+| -------- | ------------------------------- | ------------------ | ---------------------------------- |
+| `POST`   | `/api/v1/coupons/validate`      | Public             | Validate a code against a subtotal |
+| `GET`    | `/api/v1/coupons/free-shipping` | Public             | List active free-shipping codes    |
+| `GET`    | `/api/v1/coupons`               | tenant_admin/staff | List all coupons                   |
+| `POST`   | `/api/v1/coupons`               | tenant_admin       | Create                             |
+| `PATCH`  | `/api/v1/coupons/:id`           | tenant_admin       | Update                             |
+| `DELETE` | `/api/v1/coupons/:id`           | tenant_admin       | Deactivate (soft-disable)          |
 
 ## Creating a coupon
 

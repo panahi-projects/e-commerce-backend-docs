@@ -7,19 +7,21 @@ Generic payment gateway abstraction. Default implementation is a mock; real gate
 ```typescript
 // src/modules/payments/gateways/payment-gateway.interface.ts
 export interface PaymentGateway {
-  initiate(input: InitiatePaymentInput): Promise<InitiatePaymentResult>;
-  verify(input: VerifyPaymentInput): Promise<VerifyPaymentResult>;
-  refund?(input: RefundPaymentInput): Promise<RefundPaymentResult>;
+  readonly name: string;
+  createPaymentIntent(data: CreatePaymentIntentDto): Promise<PaymentIntentResult>;
+  verifyPayment(reference: string, data?: unknown): Promise<PaymentVerificationResult>;
+  processRefund(data: RefundDto): Promise<RefundResult>;
+  handleWebhook(payload: unknown, signature: string): Promise<WebhookResult>;
 }
 
-export const PAYMENT_GATEWAY = Symbol('PAYMENT_GATEWAY');
+export const PAYMENT_GATEWAY = 'PAYMENT_GATEWAY';
 ```
 
-`PaymentsService` injects the active gateway via `@Inject(PAYMENT_GATEWAY)`. `PaymentsModule.register({ gateway: 'mock' })` in `AppModule` decides which concrete class binds to that token at boot.
+`PaymentsService` injects the active gateway via `@Inject(PAYMENT_GATEWAY)`. `PaymentsModule.register({ gateway: 'mock' })` in `AppModule` decides which concrete class binds to that token at boot. Today `SupportedGateway` is `'mock'` only — the mock is the sole implementation.
 
 ## The mock gateway
 
-`src/modules/payments/gateways/mock/mock.gateway.ts` simulates a real provider: it returns a generated `reference` and `redirectUrl`, then `verify` succeeds against the same reference. Useful for local dev and tests.
+`src/modules/payments/gateways/mock/mock.gateway.ts` simulates a real provider: `createPaymentIntent` returns a generated `reference` and `redirectUrl`, then `verifyPayment` succeeds against the same reference. Useful for local dev and tests.
 
 ## Adding a real gateway
 

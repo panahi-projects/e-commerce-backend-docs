@@ -4,12 +4,12 @@ Process customer orders, advance their status, and handle refunds.
 
 ## Endpoints
 
-| Method  | Path                        | Role                 | Purpose                     |
-| ------- | --------------------------- | -------------------- | --------------------------- |
-| `GET`   | `/api/v1/orders`            | ADMIN/STAFF          | List all orders (paginated) |
-| `GET`   | `/api/v1/orders/:id`        | ADMIN/STAFF or owner | Single order                |
-| `PATCH` | `/api/v1/orders/:id/status` | ADMIN/STAFF          | Transition status           |
-| `POST`  | `/api/v1/orders/:id/refund` | ADMIN                | Mark refund-requested       |
+| Method  | Path                        | Role                       | Purpose                     |
+| ------- | --------------------------- | -------------------------- | --------------------------- |
+| `GET`   | `/api/v1/orders`            | tenant_admin/staff         | List all orders (paginated) |
+| `GET`   | `/api/v1/orders/:id`        | tenant_admin/staff or owner | Single order               |
+| `PATCH` | `/api/v1/orders/:id/status` | tenant_admin/staff         | Transition status           |
+| `POST`  | `/api/v1/orders/:id/refund` | tenant_admin               | Mark refund-requested       |
 
 ## Status transitions
 

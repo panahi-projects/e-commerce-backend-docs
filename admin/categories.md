@@ -4,18 +4,19 @@ Categories are an arbitrary-depth tree. Each node has an i18n name and an option
 
 ## Endpoints
 
-| Method   | Path                           | Role  | Purpose                         |
-| -------- | ------------------------------ | ----- | ------------------------------- |
-| `GET`    | `/api/v1/categories`           | Any   | Flat list                       |
-| `GET`    | `/api/v1/categories/tree`      | Any   | Tree                            |
-| `POST`   | `/api/v1/admin/categories`     | ADMIN | Create                          |
-| `PATCH`  | `/api/v1/admin/categories/:id` | ADMIN | Rename / re-parent              |
-| `DELETE` | `/api/v1/admin/categories/:id` | ADMIN | Delete (children must be empty) |
+| Method   | Path                          | Role                      | Purpose                         |
+| -------- | ----------------------------- | ------------------------- | ------------------------------- |
+| `GET`    | `/api/v1/categories`          | Any                       | Flat list                       |
+| `GET`    | `/api/v1/categories/tree`     | Any                       | Tree                            |
+| `GET`    | `/api/v1/categories/:slug`    | Any                       | Single category by slug         |
+| `POST`   | `/api/v1/categories`          | tenant_admin/staff        | Create                          |
+| `PATCH`  | `/api/v1/categories/:id`      | tenant_admin/staff        | Rename / re-parent              |
+| `DELETE` | `/api/v1/categories/:id`      | tenant_admin              | Delete (children must be empty) |
 
 ## Creating a child category
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/admin/categories \
+curl -X POST http://localhost:3000/api/v1/categories \
   -H 'Authorization: Bearer <admin-token>' \
   -H 'Content-Type: application/json' \
   -d '{

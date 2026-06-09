@@ -91,7 +91,7 @@ chmod 600 .env.production
 | --------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
 | `PORT`                            | `3000`                                 | If your reverse proxy expects a different host port.                                 |
 | `MONGODB_DB_NAME`                 | `ecommerce_mvp`                        | Per-environment naming (e.g. `ecommerce_staging`).                                   |
-| `ENABLED_PLUGINS`                 | All eight plugins                      | Strip plugins this deployment doesn't ship to its tenants.                           |
+| `ENABLED_PLUGINS`                 | All nine plugins                      | Strip plugins this deployment doesn't ship to its tenants.                           |
 | `FEATURE_FLAGS_CACHE_TTL_SECONDS` | `300`                                  | Lower it (60) for faster flag propagation, higher (600) for fewer Mongo round-trips. |
 | `SWAGGER_ENABLED`                 | `false` (in `docker-compose.prod.yml`) | Set `true` in non-public deployments where Swagger UI is useful.                     |
 | `LOG_LEVEL`                       | `info`                                 | `debug` while investigating something; `warn` in high-volume production.             |
@@ -115,7 +115,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production build
 npm run docker:prod:build
 ```
 
-First build takes **3–10 minutes** on a 2-vCPU host because `npm ci` runs twice (build stage + runtime stage in the multi-stage Dockerfile). Subsequent builds reuse layers and finish in well under a minute when nothing in `package*.json` has changed.
+First build takes **3–10 minutes** on a 2-vCPU host because the multi-stage Dockerfile installs the dependencies (`npm install`, using the committed `package-lock.json`) and then runs `npm run build`. Subsequent builds reuse layers and finish in well under a minute when nothing in `package*.json` has changed.
 
 ## 6. Bring the stack up
 
@@ -190,7 +190,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d
 
 | Problem                                          | Try this                                                                  |
 | ------------------------------------------------ | ------------------------------------------------------------------------- |
-| `npm ci` fails inside Docker with engine warning | Confirm Dockerfile is `node:22-alpine`, not `node:20-alpine`.             |
+| `npm install` fails inside Docker with engine warning | Confirm Dockerfile is `node:22-alpine`, not `node:20-alpine`.             |
 | App container restarts in a loop                 | `docker logs ecommerce_app` — usually a missing env var.                  |
 | `JWT_ACCESS_SECRET` validation error             | Both JWT secrets must be ≥32 chars in `.env.production`.                  |
 | `ECONNREFUSED 127.0.0.1:6379`                    | App is reading `localhost` instead of `redis` — env not loaded.           |

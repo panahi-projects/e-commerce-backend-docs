@@ -126,7 +126,7 @@ THROTTLE_AUTH_LIMIT=10
 BCRYPT_ROUNDS=12
 
 # Plugins
-ENABLED_PLUGINS=coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications
+ENABLED_PLUGINS=coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications,auditLogs
 FEATURE_FLAGS_CACHE_TTL_SECONDS=300
 
 # Misc
@@ -206,7 +206,7 @@ $env:MONGODB_URI = "mongodb://root:PASSWORD@HOST:PORT/admin?authSource=admin"
 $env:MONGODB_DB_NAME = "ecommerce_mvp"
 $env:JWT_ACCESS_SECRET = "<your-jwt-access-secret>"
 $env:JWT_REFRESH_SECRET = "<your-jwt-refresh-secret>"
-$env:ENABLED_PLUGINS = "coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications"
+$env:ENABLED_PLUGINS = "coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications,auditLogs"
 npm run seed
 ```
 
@@ -216,7 +216,7 @@ MONGODB_URI="mongodb://root:PASSWORD@HOST:PORT/admin?authSource=admin" \
 MONGODB_DB_NAME="ecommerce_mvp" \
 JWT_ACCESS_SECRET="<your-jwt-access-secret>" \
 JWT_REFRESH_SECRET="<your-jwt-refresh-secret>" \
-ENABLED_PLUGINS="coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications" \
+ENABLED_PLUGINS="coupons,reviews,compareProducts,wishlist,marketing,analytics,loyaltyPoints,notifications,auditLogs" \
 npm run seed
 ```
 
@@ -419,7 +419,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d
 | `docker pull` times out            | Registry blocked on Iranian network | Use a Docker Hub mirror: `docs.liara.ir/mirrors/docker` or set `registry-mirrors` in `/etc/docker/daemon.json`                                                 |
 | App unreachable from outside       | Firewall blocking the port          | Run `ufw allow 'Nginx Full'` or check the Liara dashboard firewall                                                                                             |
 | MongoDB container keeps restarting | Insufficient disk space             | Check `df -h`; extend the disk from the Liara Console                                                                                                          |
-| `npm ci` fails during Docker build | DNS or registry issues              | Add `RUN npm config set registry https://registry.npmjs.org/` before `RUN npm ci` in the Dockerfile, or use `--build-location iran` if deploying via Liara CLI |
+| `npm install` fails during Docker build | DNS or registry issues              | The Dockerfile already runs `npm config set registry ${NPM_REGISTRY}` (Liara mirror by default) before `npm install`. Use `--build-location iran` if deploying via Liara CLI, or override the `NPM_REGISTRY` build arg. |
 
 ---
 

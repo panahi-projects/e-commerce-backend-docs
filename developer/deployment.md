@@ -8,7 +8,7 @@ The MVP ships as a single Node.js process. Scale by adding worker pods for the m
 ## Build
 
 ```bash
-npm install --omit=dev
+npm ci
 npm run build
 ```
 

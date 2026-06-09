@@ -4,18 +4,28 @@ Manage user accounts — search, edit, activate/deactivate, soft-delete.
 
 ## Endpoints
 
-| Method   | Path                         | Role        | Purpose                          |
-| -------- | ---------------------------- | ----------- | -------------------------------- |
-| `GET`    | `/api/v1/users`              | ADMIN/STAFF | List users (paginated, filtered) |
-| `GET`    | `/api/v1/users/:id`          | ADMIN/STAFF | One user                         |
-| `PATCH`  | `/api/v1/users/:id`          | ADMIN/STAFF | Update profile fields            |
-| `PATCH`  | `/api/v1/users/:id/activate` | ADMIN/STAFF | Toggle `isActive`                |
-| `DELETE` | `/api/v1/users/:id`          | ADMIN/STAFF | Soft-delete                      |
+| Method   | Path                         | Role               | Purpose                          |
+| -------- | ---------------------------- | ------------------ | -------------------------------- |
+| `GET`    | `/api/v1/users`              | tenant_admin/staff | List users (paginated, filtered) |
+| `GET`    | `/api/v1/users/:id`          | tenant_admin/staff | One user                         |
+| `PATCH`  | `/api/v1/users/:id`          | tenant_admin/staff | Update profile fields (incl. `role`) |
+| `PATCH`  | `/api/v1/users/:id/activate` | tenant_admin/staff | Toggle `isActive`                |
+| `DELETE` | `/api/v1/users/:id`          | tenant_admin/staff | Soft-delete                      |
+
+## Hierarchy + tenant scoping
+
+User management is both **tenant-scoped** and **hierarchy-scoped**. On every `/users` endpoint a caller sees and manages only accounts **in their own tenant** whose role is **strictly below their own**:
+
+- `tenant_admin` sees `tenant_staff` and `end_user` (not peer admins).
+- `tenant_staff` sees only `end_user`.
+- `super_admin` sees and manages everything across all tenants.
+
+Targets outside that scope return `404` (they are invisible, not merely forbidden). A non-super-admin can never assign a role at or above their own — attempting it returns `403 users.role_escalation_forbidden`. Rank order: `super_admin > tenant_admin > tenant_staff > end_user`.
 
 ## Listing with filters
 
 ```bash
-curl 'http://localhost:3000/api/v1/users?role=CUSTOMER&isActive=true&q=jane' \
+curl 'http://localhost:3000/api/v1/users?role=end_user&isActive=true&q=jane' \
   -H 'Authorization: Bearer <admin-token>'
 ```
 

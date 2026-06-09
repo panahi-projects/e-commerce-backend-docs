@@ -4,20 +4,21 @@ Manage the catalogue — products, variants, and stock.
 
 ## Endpoints
 
-| Method   | Path                                       | Role        | Purpose                         |
-| -------- | ------------------------------------------ | ----------- | ------------------------------- |
-| `GET`    | `/api/v1/products`                         | Any         | Public listing (published only) |
-| `GET`    | `/api/v1/products/:id`                     | Any         | Public detail                   |
-| `GET`    | `/api/v1/admin/products`                   | ADMIN/STAFF | Admin listing (all statuses)    |
-| `POST`   | `/api/v1/admin/products`                   | ADMIN/STAFF | Create                          |
-| `PATCH`  | `/api/v1/admin/products/:id`               | ADMIN/STAFF | Update                          |
-| `DELETE` | `/api/v1/admin/products/:id`               | ADMIN       | Soft-delete                     |
-| `PATCH`  | `/api/v1/admin/products/:id/variants/:sku` | ADMIN/STAFF | Update one variant              |
+| Method   | Path                              | Role               | Purpose                         |
+| -------- | --------------------------------- | ------------------ | ------------------------------- |
+| `GET`    | `/api/v1/products`                | Any                | Public listing (published only) |
+| `GET`    | `/api/v1/products/featured`       | Any                | Featured products               |
+| `GET`    | `/api/v1/products/:slug`          | Any                | Public detail (by slug)         |
+| `GET`    | `/api/v1/products/admin/list`     | tenant_admin/staff | Admin listing (incl. drafts/archived) |
+| `POST`   | `/api/v1/products`                | tenant_admin/staff | Create                          |
+| `PATCH`  | `/api/v1/products/:id`            | tenant_admin/staff | Update                          |
+| `PATCH`  | `/api/v1/products/:id/status`     | tenant_admin/staff | Change status                   |
+| `DELETE` | `/api/v1/products/:id`            | tenant_admin       | Soft-delete                     |
 
 ## Creating a product
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/admin/products \
+curl -X POST http://localhost:3000/api/v1/products \
   -H 'Authorization: Bearer <admin-token>' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -40,11 +41,13 @@ curl -X POST http://localhost:3000/api/v1/admin/products \
 Inventory changes flow through the inventory module (event-driven so changes are auditable):
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/admin/inventory/adjust \
+curl -X PATCH http://localhost:3000/api/v1/inventory/65.../adjust \
   -H 'Authorization: Bearer <admin-token>' \
   -H 'Content-Type: application/json' \
-  -d '{ "productId": "65...", "sku": "WH-BLK", "delta": 30, "reason": "restock" }'
+  -d '{ "sku": "WH-BLK", "delta": 30, "reason": "restock" }'
 ```
+
+Other inventory endpoints (tenant_admin/staff): `GET /inventory`, `GET /inventory/alerts/low-stock`, `GET /inventory/:productId`.
 
 A `delta` of `30` adds 30 units; `-5` subtracts. The change records a `stockHistory` entry.
 

@@ -11,8 +11,11 @@ In-process pub/sub via `@nestjs/event-emitter` (`EventEmitter2`). Used to decoup
 | `order.completed`       | `OrdersService.updateStatus` (→ COMPLETED) | `{ orderId, userId, total, tenantId }`      | `LoyaltyPointsService.handleOrderCompleted`                       |
 | `review.approved`       | `ReviewsService.moderate` (→ APPROVED)     | `{ reviewId, userId, productId, tenantId }` | `LoyaltyPointsService.handleReviewApproved`                       |
 | `tenant.config.changed` | `TenantsService` (every mutation)          | `{ tenantId }`                              | `FeatureFlagService.handleTenantConfigChanged` (invalidate cache) |
-| `product.low-stock`     | `InventoryService` (when stock dips)       | `{ productId, sku, stock }`                 | (mail processor / future notification plugin)                     |
-| `payment.succeeded`     | `PaymentsService` (gateway confirms)       | `{ orderId, reference, amount }`            | (none yet)                                                        |
+| `product.low-stock`     | `ProductsService.decrementStock` (stock ≤ threshold) | `{ productId, variantSku?, available, threshold }` | (mail processor / future notification plugin)                     |
+| `payment.succeeded`     | `PaymentsService` (verify / webhook confirms) | `{ orderId, reference, amount, gateway }`   | (none yet)                                                        |
+| `payment.failed`        | `PaymentsService` (verify / webhook fails) | `{ orderId, reference, amount, gateway }`   | (none yet)                                                        |
+| `payment.refunded`      | `PaymentsService.refund`                   | `{ orderId, reference, amount, gateway }`   | (none yet)                                                        |
+| `security.audit`        | `AuthService` / `UsersService` (security actions) | `{ tenantId, action, userId?, identifier?, ip?, userAgent?, meta? }` | `AuditLogsService.handleSecurityEvent` (when `auditLogs` enabled) |
 
 The event constants are exported from `<module>/<module>.events.ts`.
 

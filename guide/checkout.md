@@ -5,6 +5,7 @@ Checkout turns your cart into an order and initiates payment.
 ## Prerequisites
 
 - You must be logged in. Guest checkout is not supported — log in first and use `POST /cart/merge` to bring your guest cart along.
+- Your profile must have a `firstName`, a `lastName`, and at least one saved address — otherwise checkout returns `400 checkout.identity_incomplete`. See the [Profile guide](./profile).
 - Your cart must not be empty.
 - All variants in your cart must still be in stock at the moment of checkout.
 
@@ -71,8 +72,10 @@ If the gateway confirms success, the order transitions to `PAID` and your cart i
 ## Cancelling before payment
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/checkout/cancel/<orderId> \
-  -H 'Authorization: Bearer <access-token>'
+curl -X POST http://localhost:3000/api/v1/checkout/cancel \
+  -H 'Authorization: Bearer <access-token>' \
+  -H 'Content-Type: application/json' \
+  -d '{ "orderId": "65..." }'
 ```
 
 Only orders in `PENDING_PAYMENT` can be cancelled this way. Reserved stock is returned to the catalogue.

@@ -10,12 +10,12 @@ The `reviews` plugin lets customers rate products. Three flags control behaviour
 
 ## Endpoints
 
-| Method   | Path                                  | Role        | Purpose                                          |
-| -------- | ------------------------------------- | ----------- | ------------------------------------------------ |
-| `GET`    | `/api/v1/products/:productId/reviews` | Public      | List approved reviews                            |
-| `POST`   | `/api/v1/products/:productId/reviews` | Authed      | Submit a review (gated by `ratingSystem`)        |
-| `PATCH`  | `/api/v1/reviews/:id`                 | ADMIN/STAFF | Approve / reject (gated by `moderationRequired`) |
-| `DELETE` | `/api/v1/reviews/:id`                 | ADMIN       | Hard-delete                                      |
+| Method   | Path                                  | Role               | Purpose                                          |
+| -------- | ------------------------------------- | ------------------ | ------------------------------------------------ |
+| `GET`    | `/api/v1/products/:productId/reviews` | Public             | List approved reviews                            |
+| `POST`   | `/api/v1/products/:productId/reviews` | Authed             | Submit a review (gated by `ratingSystem`)        |
+| `PATCH`  | `/api/v1/reviews/:id`                 | tenant_admin/staff | Approve / reject (gated by `moderationRequired`) |
+| `DELETE` | `/api/v1/reviews/:id`                 | tenant_admin       | Hard-delete                                      |
 
 ## Moderating
 

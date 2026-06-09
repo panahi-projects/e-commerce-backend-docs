@@ -14,6 +14,7 @@ const PLUGINS: PluginModuleClass[] = [
   AnalyticsPlugin,
   LoyaltyPointsPlugin,
   NotificationsPlugin,
+  AuditLogsPlugin,
 ];
 
 export const PLUGIN_REGISTRY: ReadonlyArray<PluginMetadata> = PLUGINS.map((p) => p.metadata);

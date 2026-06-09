@@ -161,7 +161,7 @@ Volumes (and therefore the database) are unaffected — only the app container r
 | Symptom                                                                 | Cause / fix                                                                                                                                                                                                                      |
 | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `git pull` fails with `Permission denied (publickey)` on a private repo | Your deploy key isn't loaded. `eval $(ssh-agent) && ssh-add ~/.ssh/<SSH_KEY_NAME>`, or use HTTPS + a PAT.                                                                                                                        |
-| `docker-compose build app` fails on `npm ci` with a network error       | The build is reaching the public npm registry from inside Iran. Fall back to [§4.3](#43-fallback-ship-images-via-docker-save--scp) — build locally, `docker save`, `scp`, `docker load`.                                         |
+| `docker-compose build app` fails on `npm install` with a network error  | The build is reaching the public npm registry from inside Iran. Fall back to [§4.3](#43-fallback-ship-images-via-docker-save--scp) — build locally, `docker save`, `scp`, `docker load`.                                         |
 | `app` container restarts in a loop after `up -d`                        | Almost always a missing env var. `docker-compose -f docker-compose.prod.yml --env-file .env.production logs app` will show what's missing.                                                                                       |
 | Healthcheck stays at `Up (unhealthy)`                                   | App is up but `/api/v1/health` fails — often Mongo or Redis isn't reachable from the container. Check `docker network inspect ecommerce_network`.                                                                                |
 | Step 7 from your laptop hangs but Step 6 on the server works            | Either the ArvanCloud firewall closed port 3000 / 80 / 443, or the DNS A record for `<DOMAIN>` isn't pointing at `<SERVER_IP>` yet.                                                                                              |
@@ -680,7 +680,7 @@ docker images          # confirm they all show up
 
 You can now `docker compose -f docker-compose.prod.yml … up -d` without it needing to pull `mongo` or `redis` again, and the `Dockerfile` build can use the local `node:22-alpine`.
 
-If even building the **app image** itself fails on the server (because `npm ci` inside the build stage tries to reach the npm registry), build on your laptop and ship the result:
+If even building the **app image** itself fails on the server (because `npm install` inside the build stage tries to reach the npm registry), build on your laptop and ship the result:
 
 ```bash
 # Local
@@ -758,12 +758,12 @@ cd /opt/ecommerce
 docker-compose -f docker-compose.prod.yml --env-file .env.production build
 ```
 
-First build takes 3–10 minutes on a 2-vCPU box because `npm ci` runs twice (build stage + runtime stage). Subsequent builds use the layer cache.
+First build takes 3–10 minutes on a 2-vCPU box because the multi-stage Dockerfile installs dependencies with `npm install` (using the committed `package-lock.json`) and then runs `npm run build`. Subsequent builds use the layer cache.
 
-If `npm ci` inside the build fails with a network error (it'll be reaching the public npm registry), see [§4.3](#43-fallback-ship-images-via-docker-save--scp) — build the image on your laptop and ship it as a tarball.
+If `npm install` inside the build fails with a network error (it'll be reaching the public npm registry), see [§4.3](#43-fallback-ship-images-via-docker-save--scp) — build the image on your laptop and ship it as a tarball.
 
 > [!NOTE]
-> If the build fails on `npm ci` with "Exit handler never called!", the base image is too old for the lockfile. The Dockerfile pins `node:22-alpine` — don't downgrade it.
+> If the build fails on `npm install` with "Exit handler never called!", the base image is too old for the lockfile. The Dockerfile pins `node:22-alpine` — don't downgrade it.
 
 ## 8. Bring the stack up
 
@@ -929,7 +929,7 @@ There is **no recycle bin** on Linux — every `rm` is permanent. Always double-
 | `apt install -y` shows a TUI dialog about PAM / sshd_config                      | Choose **No** / **keep the local version currently installed**. See §3.4.                                   |
 | `docker pull` errors with `dial tcp: lookup … i/o timeout`                       | Docker daemon DNS broken — add `"dns": [...]` to `/etc/docker/daemon.json`. See §4.2.                       |
 | `docker.io/library/X: not found` from a mirror                                   | Mirror is reachable but doesn't host that image — try the next mirror, or fall back to save/load (§4.3).    |
-| `npm ci` fails inside Docker with engine warning                                 | Confirm Dockerfile is `node:22-alpine`, not `node:20-alpine`.                                               |
+| `npm install` fails inside Docker with engine warning                            | Confirm Dockerfile is `node:22-alpine`, not `node:20-alpine`.                                               |
 | App container restarts in a loop                                                 | `docker logs ecommerce_app` — usually a missing env var.                                                    |
 | `JWT_ACCESS_SECRET` validation error                                             | Both JWT secrets must be ≥32 chars in `.env.production`.                                                    |
 | `ECONNREFUSED 127.0.0.1:6379`                                                    | App is reading `localhost` instead of `redis` — env not loaded.                                             |

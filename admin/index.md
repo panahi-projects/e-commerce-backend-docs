@@ -4,13 +4,14 @@ This section is for operators — shop owners, support staff, and platform admin
 
 ## Who can do what
 
-| Role       | Capabilities                                                                      |
-| ---------- | --------------------------------------------------------------------------------- |
-| `ADMIN`    | Everything: tenant config, plugin/flag toggles, refunds, user management          |
-| `STAFF`    | Catalogue work, order processing, review moderation, but no tenant/plugin control |
-| `CUSTOMER` | Storefront usage only                                                             |
+| Role           | Capabilities                                                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| `super_admin`  | Platform-wide (tenantId null). Bypasses tenant scope, role checks, and feature gates — sees all tenants |
+| `tenant_admin` | Everything within their tenant: tenant config (super_admin only for tenant CRUD), plugin/flag toggles, refunds, user management |
+| `tenant_staff` | Catalogue work, order processing, review moderation, but no tenant/plugin control                  |
+| `end_user`     | Storefront usage only                                                                              |
 
-Most admin endpoints live under `/api/v1/admin/...`. All require a bearer JWT belonging to a user with the right role — and they all run in the context of a tenant (resolved from subdomain, `X-Tenant-ID`, or JWT claim).
+Some admin endpoints live under `/api/v1/admin/...` (tenants, plugin registry, SMS test); others sit on their module root (e.g. `/users`, `/orders`, `/coupons`). All require a bearer JWT belonging to a user with the right role — and they all run in the context of a tenant (resolved from subdomain, `X-Tenant-ID`, or JWT claim). `super_admin` operates across all tenants and bypasses these checks.
 
 ## What's unique about this platform
 

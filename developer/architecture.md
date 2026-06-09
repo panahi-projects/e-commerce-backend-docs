@@ -23,7 +23,8 @@ src/
     ├── plugin.registry.ts        # All plugin classes
     ├── plugin-loader.module.ts   # forRoot() reads ENABLED_PLUGINS
     ├── coupons/     reviews/    compare-products/  wishlist/
-    └── marketing/   analytics/  loyalty-points/    notifications/
+    ├── marketing/   analytics/  loyalty-points/    notifications/
+    └── audit-logs/
 ```
 
 ## Module dependency direction
