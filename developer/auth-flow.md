@@ -42,7 +42,7 @@ Sending neither `password` nor `code` returns `400 auth.credentials_required`. A
 > **OTP generation, storage, and delivery are decoupled.** The OTP is generated and stored first; sending it is best-effort. If the SMS/email can't be delivered, registration (and `request-otp`) **still succeed** — the response stays `200` and reports `delivery: { channel, sent: false, detail }`. The stored code is fully usable: read it from the `otps` collection (each row carries the `identifier` it was generated for; set `OTP_HASHED=false` to store the raw code) and complete `verify-otp` manually. Delivery failures no longer return `502` from the auth endpoints.
 
 > [!TIP]
-> Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in Mailtrap, SMS in the sms.ir sandbox). You can also set `OTP_HASHED=false` to store the **raw** code in the `otps` collection (instead of the default SHA-256 hash) and read it straight from the DB — OTPs are short-lived and TTL-expired, so this is testing-only; keep `OTP_HASHED=true` in production.
+> Outside production the issued OTP is logged to the server console as `[DEV OTP] <PURPOSE> for <identifier>: <code>` so you can copy/paste it during local testing (email also lands in your SMTP inbox, SMS in the configured provider's sandbox/log). You can also set `OTP_HASHED=false` to store the **raw** code in the `otps` collection (instead of the default SHA-256 hash) and read it straight from the DB — OTPs are short-lived and TTL-expired, so this is testing-only; keep `OTP_HASHED=true` in production.
 
 > [!NOTE]
 > Profile details (first name, last name, address) are filled later via the profile endpoints. Checkout enforces them — see [Checkout identity gate](#identity-gate).
@@ -51,8 +51,10 @@ Sending neither `password` nor `code` returns `400 auth.credentials_required`. A
 
 | Token         | Lifetime | Storage                           | Purpose                                             |
 | ------------- | -------- | --------------------------------- | --------------------------------------------------- |
-| Access JWT    | 15 min   | Client memory (response body)     | Sent on every API call as `Authorization: Bearer …` |
-| Refresh token | 7 days   | httpOnly cookie (`refresh_token`) | Used only to renew the access token                 |
+| Access JWT    | 15 min¹  | Client memory (response body)     | Sent on every API call as `Authorization: Bearer …` |
+| Refresh token | 7 days²  | httpOnly cookie (`refresh_token`) | Used only to renew the access token                 |
+
+¹ Default; configurable via `JWT_ACCESS_EXPIRES_IN`. &nbsp; ² Configurable via `JWT_REFRESH_EXPIRES_IN`.
 
 ## Login sequence
 
@@ -112,7 +114,7 @@ The auth service generates 6-digit codes, stores them hashed with an attempt cou
 | Channel | Send | Verify | Delivery |
 | ------- | ---- | ------ | -------- |
 | Email   | `POST /auth/otp/send`     | `POST /auth/otp/verify`     | `MailService` |
-| SMS     | `POST /auth/otp/send-sms` | `POST /auth/otp/verify-sms` | `SmsService` → sms.ir `/send/verify` (see [SMS](./sms)) |
+| SMS     | `POST /auth/otp/send-sms` | `POST /auth/otp/verify-sms` | `SmsService` (multi-provider; default **Sabanovin**, see [SMS](./sms)) |
 
 The SMS endpoints take `{ phone, purpose }` / `{ phone, purpose, code }`. `purpose` is an `OtpPurpose` (`EMAIL_VERIFICATION`, `PHONE_VERIFICATION`, `PASSWORD_RESET`, `LOGIN_2FA`). Verifying a `PHONE_VERIFICATION` OTP sets `User.isPhoneVerified`. Send is silent for unknown phones/emails (never reveals whether an identifier is registered). The same hashed-OTP store and attempt/TTL rules back both channels.
 

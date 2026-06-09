@@ -50,6 +50,34 @@ unscoped and may target any tenant.
 `role` against the required list. `super_admin` always passes. Routes without
 `@Roles` allow any authenticated user; `@Public()` skips auth entirely.
 
+## Hierarchical visibility (user management)
+
+Beyond the static `@Roles()` gate, the **user-management endpoints** (`/users`,
+`/users/:id`, and the audit log) enforce a strict authority hierarchy so a
+caller can only see and act on accounts **below** their own rank, **within their
+own tenant**:
+
+```
+super_admin (3) › tenant_admin (2) › tenant_staff (1) › end_user (0)
+```
+
+- **Listing** (`GET /users`) is filtered to the caller's tenant and to roles
+  *strictly below* the caller's own. A `tenant_admin` sees `tenant_staff` +
+  `end_user`; a `tenant_staff` sees only `end_user`. Peers (same rank) and
+  anyone above are never returned. Requesting an out-of-scope role yields an
+  empty page (no existence leak).
+- **Reading / updating / deleting** a single user (`GET|PATCH|DELETE /users/:id`,
+  `/users/:id/activate`) resolves the target only if the caller outranks it and
+  shares its tenant; otherwise it returns **404** (hidden, not 403).
+- **No privilege escalation:** a non-super-admin can never assign a role at or
+  above their own (a `tenant_admin` cannot promote a user to `tenant_admin` or
+  `super_admin`). Attempting it returns 403 `users.role_escalation_forbidden`.
+- `super_admin` bypasses both scopes — all tenants, all roles.
+
+The ranking helpers (`ROLE_RANK`, `rolesBelow`, `outranks`) live in
+`src/common/enums/role.enum.ts`; enforcement is in
+`src/modules/users/users.service.ts`.
+
 ## Dynamic permission policies
 
 For fine-grained, runtime-editable control, opt a route in with

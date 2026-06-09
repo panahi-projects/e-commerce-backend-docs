@@ -1,6 +1,6 @@
 # SMS
 
-Generic, **multi-provider** SMS abstraction. Like payments, the rest of the app depends only on an interface — switching providers is an env change (`SMS_PROVIDER`). Ships with sms.ir, Sabanovin, and Melipayamak implementations, plus a log fallback.
+Generic, **multi-provider** SMS abstraction. Like payments, the rest of the app depends only on an interface — switching providers is an env change (`SMS_DEFAULT_PROVIDER`). Ships with sms.ir, Sabanovin, and Melipayamak implementations, plus a log fallback.
 
 ## The interface
 
@@ -121,4 +121,4 @@ Set **`SMS_DEBUG_LOG=true`** to have the active provider log every outgoing SMS 
 
 ## Per-tenant credentials (future)
 
-Credentials are global today (one provider account per deployment, selected by `SMS_PROVIDER`). `SmsService` is structured so a per-tenant credential/provider resolver can be layered in without changing call sites — the interface methods stay the same.
+Credentials are global today (one provider account per deployment, selected by `SMS_DEFAULT_PROVIDER`). `SmsService` is structured so a per-tenant credential/provider resolver can be layered in without changing call sites — the interface methods stay the same.
